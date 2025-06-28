@@ -100,8 +100,8 @@ src/
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/virtual-art-gallery.git
-cd virtual-art-gallery
+git clone https://github.com/rahel-yab/Graphics-Group-Project.git
+cd Graphics-Group-Project
 ```
 
 2. Install dependencies:
