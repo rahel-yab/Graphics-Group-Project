@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Virtual Art Gallery Tour</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #000;
+        overflow: hidden;
+      }
+      
+      #gallery-container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        cursor: crosshair;
+      }
+      
+      #info-panel {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        max-width: 320px;
+        z-index: 100;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      }
+      
+      #info-panel h2 {
+        margin: 0 0 15px 0;
+        font-size: 24px;
+        color: #ffd700;
+      }
+      
+      #info-panel p {
+        margin: 8px 0;
+        line-height: 1.5;
+        font-size: 14px;
+      }
+      
+      #controls {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        z-index: 100;
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        min-width: 280px;
+      }
+      
+      #controls h3 {
+        margin: 0 0 15px 0;
+        color: #ffd700;
+        font-size: 18px;
+      }
+      
+      .control-row {
+        display: flex;
+        align-items: center;
+        margin: 8px 0;
+        font-size: 14px;
+      }
+      
+      .control-key {
+        background: linear-gradient(145deg, #4a4a4a, #2a2a2a);
+        color: #ffd700;
+        padding: 6px 12px;
+        border-radius: 8px;
+        margin-right: 12px;
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        min-width: 80px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      
+      #artwork-info {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.95);
+        color: #333;
+        padding: 25px;
+        border-radius: 15px;
+        max-width: 380px;
+        z-index: 100;
+        transition: all 0.4s ease;
+        backdrop-filter: blur(15px);
+        opacity: 0;
+        transform: translateY(-50%) translateX(100%);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      }
+      
+      #artwork-info.visible {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
+      
+      #artwork-info h3 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+        font-size: 22px;
+      }
+      
+      #artwork-info .artist {
+        color: #7f8c8d;
+        font-style: italic;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+      
+      #artwork-info .description {
+        line-height: 1.6;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+      
+      .close-btn {
+        background: linear-gradient(145deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      
+      .close-btn:hover {
+        background: linear-gradient(145deg, #2980b9, #1f5f8b);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      }
+      
+      #loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 28px;
+        z-index: 200;
+        text-align: center;
+      }
+      
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #ffd700;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      #crosshair {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 20px;
+        pointer-events: none;
+        z-index: 50;
+      }
+      
+      #crosshair::before,
+      #crosshair::after {
+        content: '';
+        position: absolute;
+        background: rgba(255, 215, 0, 0.8);
+        border-radius: 2px;
+      }
+      
+      #crosshair::before {
+        width: 2px;
+        height: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      
+      #crosshair::after {
+        width: 20px;
+        height: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      
+      .interaction-hint {
+        position: absolute;
+        background: rgba(255, 215, 0, 0.9);
+        color: #000;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: bold;
+        pointer-events: none;
+        z-index: 60;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        transform: translate(-50%, -100%);
+        margin-top: -10px;
+      }
+      
+      .interaction-hint.visible {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading">
+      <div>Loading Virtual Gallery...</div>
+      <div class="loading-spinner"></div>
+    </div>
+    
+    <div id="gallery-container">
+      <div id="crosshair"></div>
+      <div id="interaction-hint" class="interaction-hint">Click to view artwork details</div>
+      
+      <div id="info-panel">
+        <h2>🎨 Virtual Art Gallery</h2>
+        <p>Welcome to our interactive 3D art museum. Explore different rooms and discover amazing artworks!</p>
+        <p><strong>Current Room:</strong> <span id="current-room">Main Gallery</span></p>
+        <p><strong>Tip:</strong> Move your mouse to look around, click on artworks to learn more!</p>
+      </div>
+      
+      <div id="controls">
+        <h3>🎮 Navigation Controls</h3>
+        <div class="control-row">
+          <span class="control-key">↑ W</span>
+          <span>Move Forward</span>
+        </div>
+        <div class="control-row">
+          <span class="control-key">↓ S</span>
+          <span>Move Backward</span>
+        </div>
+        <div class="control-row">
+          <span class="control-key">← A</span>
+          <span>Move Left</span>
+        </div>
+        <div class="control-row">
+          <span class="control-key">→ D</span>
+          <span>Move Right</span>
+        </div>
+        <div class="control-row">
+          <span class="control-key">Mouse</span>
+          <span>Look Around</span>
+        </div>
+        <div class="control-row">
+          <span class="control-key">Click</span>
+          <span>View Artwork</span>
+        </div>
+        <div class="control-row">
+          <span class="control-key">R</span>
+          <span>Reset Position</span>
+        </div>
+        <div class="control-row">
+          <span class="control-key">ESC</span>
+          <span>Release Mouse</span>
+        </div>
+      </div>
+      
+      <div id="artwork-info">
+        <h3 id="art-title">Artwork Title</h3>
+        <div id="art-artist" class="artist">Artist Name</div>
+        <div id="art-description" class="description">Artwork description goes here...</div>
+        <button class="close-btn" onclick="closeArtworkInfo()">Close Details</button>
+      </div>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
