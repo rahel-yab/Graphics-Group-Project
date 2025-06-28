@@ -86,7 +86,7 @@ src/
 
 #### 5. **Texture Mapping & Procedural Materials** 
 
-#### 6. **Animation** ✅
+#### 6. **Animation** 
 
 ## 🚀 Getting Started
 
