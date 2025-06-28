@@ -76,15 +76,15 @@ src/
 
 ### Key Technical Features
 
-#### 1. **Minimum 5 Unique 3D Objects** ✅
+#### 1. **Morethan 5 Unique 3D Objects** 
 
-#### 2. **Camera Controls** ✅
+#### 2. **Camera Controls** 
 
-#### 3. **Lighting System** ✅
+#### 3. **Lighting System** 
 
-#### 4. **User Interaction** ✅
+#### 4. **User Interaction** 
 
-#### 5. **Texture Mapping & Procedural Materials** ✅
+#### 5. **Texture Mapping & Procedural Materials** 
 
 #### 6. **Animation** ✅
 
